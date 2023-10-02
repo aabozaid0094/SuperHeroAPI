@@ -45,7 +45,7 @@ namespace SuperHeroAPI.Services.SuperHeroService
 
         public async Task<List<SuperHero>?> UpdateHero(int id, SuperHero updatedSuperHero)
         {
-            var superHero = await _dataContext.SuperHeroes.FindAsync(id);
+            var superHero = await _dataContext.SuperHeroes.Include(sh => sh.Backpack).FirstOrDefaultAsync(sh => sh.Id == id);
             if (superHero is null)
                 return null;
 
@@ -53,6 +53,8 @@ namespace SuperHeroAPI.Services.SuperHeroService
             superHero.FirstName = string.IsNullOrEmpty(updatedSuperHero.FirstName) ? superHero.FirstName : updatedSuperHero.FirstName;
             superHero.LastName = string.IsNullOrEmpty(updatedSuperHero.LastName) ? superHero.LastName : updatedSuperHero.LastName;
             superHero.Place = string.IsNullOrEmpty(updatedSuperHero.Place) ? superHero.Place : updatedSuperHero.Place;
+            superHero.Backpack = (updatedSuperHero.Backpack is null) ? superHero.Backpack : updatedSuperHero.Backpack;
+
             await _dataContext.SaveChangesAsync();
 
             return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).ToListAsync();

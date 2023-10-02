@@ -41,7 +41,7 @@ namespace SuperHeroAPI.Migrations
                     b.HasIndex("SuperHeroId")
                         .IsUnique();
 
-                    b.ToTable("Backpacks");
+                    b.ToTable("Backpacks", (string)null);
                 });
 
             modelBuilder.Entity("SuperHeroAPI.Models.SuperHero", b =>
@@ -70,7 +70,7 @@ namespace SuperHeroAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SuperHeroes");
+                    b.ToTable("SuperHeroes", (string)null);
                 });
 
             modelBuilder.Entity("SuperHeroAPI.Models.Backpack", b =>
