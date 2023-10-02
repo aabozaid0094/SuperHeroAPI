@@ -18,7 +18,7 @@ namespace SuperHeroAPI.Services.SuperHeroService
             await _dataContext.SuperHeroes.AddAsync(superHero);
             await _dataContext.SaveChangesAsync();
             
-            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).ToListAsync();
+            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).Include(sh => sh.Factions).ToListAsync();
         }
 
         public async Task<List<SuperHero>?> DeleteHero(int id)
@@ -30,22 +30,22 @@ namespace SuperHeroAPI.Services.SuperHeroService
             _dataContext.SuperHeroes.Remove(superHero);
             await _dataContext.SaveChangesAsync();
             
-            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).ToListAsync();
+            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).Include(sh => sh.Factions).ToListAsync();
         }
 
         public async Task<List<SuperHero>> GetAllHeroes()
         {
-            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).ToListAsync();
+            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).Include(sh => sh.Factions).ToListAsync();
         }
 
         public async Task<SuperHero?> GetSingleHero(int id)
         {
-            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).FirstOrDefaultAsync(sh => sh.Id == id);
+            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).Include(sh => sh.Factions).FirstOrDefaultAsync(sh => sh.Id == id);
         }
 
         public async Task<List<SuperHero>?> UpdateHero(int id, SuperHero updatedSuperHero)
         {
-            var superHero = await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).FirstOrDefaultAsync(sh => sh.Id == id);
+            var superHero = await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).Include(sh => sh.Factions).FirstOrDefaultAsync(sh => sh.Id == id);
             if (superHero is null)
                 return null;
 
@@ -54,11 +54,12 @@ namespace SuperHeroAPI.Services.SuperHeroService
             superHero.LastName = string.IsNullOrEmpty(updatedSuperHero.LastName) ? superHero.LastName : updatedSuperHero.LastName;
             superHero.Place = string.IsNullOrEmpty(updatedSuperHero.Place) ? superHero.Place : updatedSuperHero.Place;
             superHero.Backpack = (updatedSuperHero.Backpack is null && !string.IsNullOrEmpty(updatedSuperHero.Backpack.Description)) ? superHero.Backpack : updatedSuperHero.Backpack;
-            superHero.Weapons = (updatedSuperHero.Weapons.Count > 0) ? superHero.Weapons : updatedSuperHero.Weapons;
+            superHero.Weapons = (updatedSuperHero.Weapons.Count < 1) ? superHero.Weapons : updatedSuperHero.Weapons;
+            superHero.Factions = (updatedSuperHero.Factions.Count < 1) ? superHero.Factions : updatedSuperHero.Factions;
 
             await _dataContext.SaveChangesAsync();
 
-            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).ToListAsync();
+            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).Include(sh => sh.Factions).ToListAsync();
         }
     }
 }

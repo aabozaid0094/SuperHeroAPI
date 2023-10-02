@@ -9,5 +9,6 @@
         public string Place { get; set; } = string.Empty;
         public Backpack? Backpack { get; set; }
         public List<Weapon> Weapons { get; set; } = new List<Weapon>();
+        public List<Faction> Factions { get; set; } = new List<Faction>();
     }
 }
