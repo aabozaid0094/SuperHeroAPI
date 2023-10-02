@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SuperHeroAPI.Data;
 using SuperHeroAPI.Services.SuperHeroService;
 
@@ -10,7 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ISuperHeroService, SuperHeroService>();
-builder.Services.AddDbContext<DataContext>();
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
