@@ -18,7 +18,7 @@ namespace SuperHeroAPI.Services.SuperHeroService
             await _dataContext.SuperHeroes.AddAsync(superHero);
             await _dataContext.SaveChangesAsync();
             
-            return await _dataContext.SuperHeroes.ToListAsync();
+            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).ToListAsync();
         }
 
         public async Task<List<SuperHero>?> DeleteHero(int id)
@@ -30,17 +30,17 @@ namespace SuperHeroAPI.Services.SuperHeroService
             _dataContext.SuperHeroes.Remove(superHero);
             await _dataContext.SaveChangesAsync();
             
-            return await _dataContext.SuperHeroes.ToListAsync();
+            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).ToListAsync();
         }
 
         public async Task<List<SuperHero>> GetAllHeroes()
         {
-            return await _dataContext.SuperHeroes.ToListAsync();
+            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).ToListAsync();
         }
 
         public async Task<SuperHero?> GetSingleHero(int id)
         {
-            return await _dataContext.SuperHeroes.FindAsync(id);
+            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).FirstOrDefaultAsync(sh => sh.Id == id);
         }
 
         public async Task<List<SuperHero>?> UpdateHero(int id, SuperHero updatedSuperHero)
@@ -55,7 +55,7 @@ namespace SuperHeroAPI.Services.SuperHeroService
             superHero.Place = string.IsNullOrEmpty(updatedSuperHero.Place) ? superHero.Place : updatedSuperHero.Place;
             await _dataContext.SaveChangesAsync();
 
-            return await _dataContext.SuperHeroes.ToListAsync();
+            return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).ToListAsync();
         }
     }
 }
