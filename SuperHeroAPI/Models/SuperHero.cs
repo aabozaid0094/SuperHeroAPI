@@ -8,5 +8,6 @@
         public string LastName { get; set; } = string.Empty;
         public string Place { get; set; } = string.Empty;
         public Backpack? Backpack { get; set; }
+        public List<Weapon> Weapons { get; set; } = new List<Weapon>();
     }
 }
