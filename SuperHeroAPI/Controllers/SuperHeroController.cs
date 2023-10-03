@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SuperHeroAPI.DTOs;
 using SuperHeroAPI.Models;
 using SuperHeroAPI.Services.SuperHeroService;
 
@@ -27,15 +28,15 @@ namespace SuperHeroAPI.Controllers
             return (result is null) ? NotFound("Sorry, This super hero does not exist.") : Ok(result);
         }
         [HttpPost]
-        public async Task<ActionResult<List<SuperHero>>> AddHero([FromBody] SuperHero superHero)
+        public async Task<ActionResult<List<SuperHero>>> AddHero([FromBody] SuperHeroCreateDto request)
         {
-            var result = await _superHeroService.AddHero(superHero);
+            var result = await _superHeroService.AddHero(request);
             return Ok(result);
         }
         [HttpPut("{id}")]
-        public async Task<ActionResult<List<SuperHero>>> UpdateHero(int id, [FromBody] SuperHero updatedSuperHero)
+        public async Task<ActionResult<List<SuperHero>>> UpdateHero(int id, [FromBody] SuperHeroCreateDto request)
         {
-            var result = await _superHeroService.UpdateHero(id, updatedSuperHero);
+            var result = await _superHeroService.UpdateHero(id, request);
             return (result is null) ? NotFound("Sorry, This super hero does not exist.") : Ok(result);
         }
         [HttpDelete("{id}")]

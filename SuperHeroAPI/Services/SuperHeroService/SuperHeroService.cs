@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SuperHeroAPI.Data;
+using SuperHeroAPI.DTOs;
 using SuperHeroAPI.Models;
+using System.Linq;
 
 namespace SuperHeroAPI.Services.SuperHeroService
 {
@@ -13,8 +15,12 @@ namespace SuperHeroAPI.Services.SuperHeroService
             _dataContext = dataContext;
         }
 
-        public async Task<List<SuperHero>> AddHero(SuperHero superHero)
+        public async Task<List<SuperHero>> AddHero(SuperHeroCreateDto request)
         {
+            var backpack = new Backpack() { Description = request.Backpack.Description };
+            var weapons = request.Weapons.Select(w => new Weapon() { Name = w.Name }).ToList();
+            var factions = request.Factions.Select(f => new Faction() { Name = f.Name }).ToList();
+            var superHero = new SuperHero() { Name = request.Name, FirstName = request.FirstName, LastName = request.LastName, Backpack = backpack, Weapons = weapons };
             await _dataContext.SuperHeroes.AddAsync(superHero);
             await _dataContext.SaveChangesAsync();
             
@@ -43,19 +49,26 @@ namespace SuperHeroAPI.Services.SuperHeroService
             return await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).Include(sh => sh.Factions).FirstOrDefaultAsync(sh => sh.Id == id);
         }
 
-        public async Task<List<SuperHero>?> UpdateHero(int id, SuperHero updatedSuperHero)
+        public async Task<List<SuperHero>?> UpdateHero(int id, SuperHeroCreateDto request)
         {
             var superHero = await _dataContext.SuperHeroes.Include(sh => sh.Backpack).Include(sh => sh.Weapons).Include(sh => sh.Factions).FirstOrDefaultAsync(sh => sh.Id == id);
             if (superHero is null)
                 return null;
 
-            superHero.Name = string.IsNullOrEmpty(updatedSuperHero.Name) ? superHero.Name : updatedSuperHero.Name;
-            superHero.FirstName = string.IsNullOrEmpty(updatedSuperHero.FirstName) ? superHero.FirstName : updatedSuperHero.FirstName;
-            superHero.LastName = string.IsNullOrEmpty(updatedSuperHero.LastName) ? superHero.LastName : updatedSuperHero.LastName;
-            superHero.Place = string.IsNullOrEmpty(updatedSuperHero.Place) ? superHero.Place : updatedSuperHero.Place;
-            superHero.Backpack = (updatedSuperHero.Backpack is null && !string.IsNullOrEmpty(updatedSuperHero.Backpack.Description)) ? superHero.Backpack : updatedSuperHero.Backpack;
-            superHero.Weapons = (updatedSuperHero.Weapons.Count < 1) ? superHero.Weapons : updatedSuperHero.Weapons;
-            superHero.Factions = (updatedSuperHero.Factions.Count < 1) ? superHero.Factions : updatedSuperHero.Factions;
+
+
+            superHero.Name = string.IsNullOrEmpty(request.Name) ? superHero.Name : request.Name;
+            superHero.FirstName = string.IsNullOrEmpty(request.FirstName) ? superHero.FirstName : request.FirstName;
+            superHero.LastName = string.IsNullOrEmpty(request.LastName) ? superHero.LastName : request.LastName;
+            superHero.Place = string.IsNullOrEmpty(request.Place) ? superHero.Place : request.Place;
+
+            var backpack = new Backpack() { Description = request.Backpack.Description };
+            var weapons = request.Weapons.Select(w => w.Name).Except(superHero.Weapons.Select(shw => shw.Name)).Select(wn => new Weapon() { Name = wn }).ToList();
+            var factions = request.Factions.Select(f => f.Name).Except(superHero.Factions.Select(shf => shf.Name)).Select(fn => new Faction() { Name = fn }).ToList();
+
+            superHero.Backpack = (!string.IsNullOrEmpty(request.Backpack.Description)) ? superHero.Backpack : backpack;
+            if (weapons.Count < 1) superHero.Weapons.AddRange(weapons);
+            if (factions.Count < 1) superHero.Factions.AddRange(factions);
 
             await _dataContext.SaveChangesAsync();
 
